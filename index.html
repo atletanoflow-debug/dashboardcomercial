@@ -67,27 +67,53 @@
   .kpi-value{ font-size:1.7rem; font-weight:700; letter-spacing:-0.01em; }
   .kpi-sub{ font-size:.8rem; color:var(--text-muted); margin-top:4px; }
 
-  .funnel-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 22px 12px; box-shadow:var(--shadow); }
-  .funnel-row{ display:flex; align-items:center; gap:16px; }
-  .funnel-stage-label{ width:150px; flex-shrink:0; font-size:.88rem; font-weight:700; color:var(--text-primary); }
-  .funnel-track{ flex:1; background:var(--surface-alt); border-radius:var(--radius-sm); height:34px; position:relative; overflow:hidden; }
-  .funnel-fill{ height:100%; min-width:34px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:flex-end; padding-inline:12px; box-sizing:border-box; transition:width .2s; }
-  .funnel-fill .val{ color:#fff; font-weight:700; font-size:.85rem; white-space:nowrap; }
-  .funnel-fill.light .val{ color:var(--accent-strong); }
-  .funnel-meta{ width:120px; flex-shrink:0; text-align:right; font-size:.8rem; color:var(--text-muted); }
-  .funnel-meta b{ color:var(--text-primary); font-weight:700; }
-  .funnel-drop{ display:flex; align-items:center; gap:6px; font-size:.74rem; color:var(--text-muted); padding:6px 0 6px 166px; }
-  .funnel-drop svg{ width:12px; height:12px; flex-shrink:0; }
-  @media (max-width: 760px){
-    .funnel-stage-label{ width:104px; font-size:.8rem; }
-    .funnel-meta{ width:88px; }
-    .funnel-drop{ padding-left:120px; }
-  }
-  @media (max-width: 480px){
-    .funnel-row{ flex-wrap:wrap; }
-    .funnel-stage-label{ width:100%; }
-    .funnel-meta{ width:100%; text-align:left; }
-    .funnel-drop{ padding-left:0; }
+  .funnel-summary{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 22px; box-shadow:var(--shadow); margin-bottom:18px; }
+  .funnel-summary-item{ display:flex; align-items:center; gap:12px; }
+  .funnel-summary-icon{ width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .funnel-summary-icon svg{ width:20px; height:20px; }
+  .funnel-summary-icon.blue{ background:var(--accent-soft); color:var(--accent-strong); }
+  .funnel-summary-icon.green{ background:#e8f5ec; color:#1f8a4c; }
+  .funnel-summary-label{ font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-bottom:3px; }
+  .funnel-summary-value{ font-size:1.5rem; font-weight:700; letter-spacing:-0.01em; }
+  .funnel-summary-value.green{ color:#1f8a4c; }
+  .funnel-summary-value span.small{ font-size:.85rem; font-weight:500; color:var(--text-muted); margin-left:6px; }
+  .funnel-summary-divider{ width:1px; align-self:stretch; background:var(--border); }
+
+  .funnel-pyramid{ display:flex; flex-direction:column; align-items:center; gap:0; padding:8px 0 4px; }
+  .funnel-stage{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:22px; width:100%; }
+  .funnel-stage-left{ display:flex; align-items:center; gap:10px; }
+  .funnel-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .funnel-dot.blue{ background:var(--accent); }
+  .funnel-dot.orange{ background:#c98a2c; }
+  .funnel-dot.purple{ background:#7a5cb8; }
+  .funnel-stage-label{ font-size:.92rem; font-weight:700; color:var(--text-primary); }
+  .funnel-stage-value{ font-size:1.25rem; font-weight:700; letter-spacing:-0.01em; color:var(--text-primary); }
+  .funnel-stage-value.accent{ color:var(--accent-strong); }
+  .funnel-stage.final{ background:#e8f5ec; border-color:#bfe3cc; }
+  .funnel-stage.final .funnel-stage-label{ color:#1a6b3c; }
+  .funnel-stage.final .funnel-stage-icon{ width:30px; height:30px; border-radius:50%; background:#1f8a4c; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .funnel-stage.final .funnel-stage-icon svg{ width:16px; height:16px; }
+  .funnel-stage.final .funnel-stage-right{ display:flex; align-items:center; gap:12px; }
+  .funnel-stage.final .funnel-stage-value{ color:#1a6b3c; font-size:1.4rem; }
+  .funnel-revenue-pill{ background:#fff; border:1px solid #bfe3cc; color:#1a6b3c; font-weight:700; font-size:.82rem; padding:6px 14px; border-radius:999px; white-space:nowrap; }
+  .funnel-badge-row{ display:flex; align-items:center; justify-content:center; padding:6px 0; }
+  .funnel-badge{ display:inline-flex; align-items:center; gap:6px; background:#1f8a4c; color:#fff; font-size:.74rem; font-weight:700; padding:5px 14px; border-radius:999px; white-space:nowrap; }
+  .funnel-badge svg{ width:11px; height:11px; }
+
+  .funnel-stats-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:18px; }
+  .funnel-stat-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); display:flex; align-items:center; gap:14px; }
+  .funnel-stat-icon{ width:40px; height:40px; border-radius:11px; background:var(--accent-soft); color:var(--accent-strong); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .funnel-stat-icon svg{ width:19px; height:19px; }
+  .funnel-stat-label{ font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-bottom:3px; }
+  .funnel-stat-value{ font-size:1.3rem; font-weight:700; letter-spacing:-0.01em; }
+
+  @media (max-width: 600px){
+    .funnel-stage{ padding:12px 16px; gap:12px; }
+    .funnel-stage-label{ font-size:.84rem; }
+    .funnel-stage-value{ font-size:1.05rem; }
+    .funnel-summary{ flex-direction:column; align-items:flex-start; }
+    .funnel-summary-divider{ display:none; }
+    .funnel-stats-row{ grid-template-columns:1fr; }
   }
 
   .agenda-summary{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
@@ -216,7 +242,9 @@
       <h2>Funil de Conversão</h2>
       <p class="desc">Jornada dos leads do primeiro contato até a venda, no período selecionado.</p>
     </div>
-    <div class="funnel-card" id="funnelHolder"></div>
+    <div id="funnelSummary"></div>
+    <div class="funnel-pyramid" id="funnelHolder"></div>
+    <div class="funnel-stats-row" id="funnelStats"></div>
   </section>
 
   <section class="panel" id="panel-sdr">
@@ -445,9 +473,10 @@
           var realizada = isFuture ? false : chance(rng, 0.78);
           var proposta = realizada && chance(rng, 0.55);
           var venda = proposta && chance(rng, 0.4);
+          var valor = venda ? Math.round(randInt(rng, 4000, 14000) / 500) * 500 : 0;
           if (!isFuture) lead.status = venda ? "Cliente" : (realizada ? "Sem venda" : "No-show");
-          lead.call = { data: callYmd, agendada: true, realizada: realizada, proposta: proposta, venda: venda, pendente: isFuture };
-          MOCK_CALLS.push({ closer: closerMeta.name, sdr: sdr, responsavel: responsavel, origem: origem, data: callYmd, realizada: realizada, proposta: proposta, venda: venda });
+          lead.call = { data: callYmd, agendada: true, realizada: realizada, proposta: proposta, venda: venda, valor: valor, pendente: isFuture };
+          MOCK_CALLS.push({ closer: closerMeta.name, sdr: sdr, responsavel: responsavel, origem: origem, data: callYmd, realizada: realizada, proposta: proposta, venda: venda, valor: valor });
         }
         MOCK_LEADS.push(lead);
       }
@@ -655,7 +684,10 @@
     trendUp: '<path d="M3 17l6-6 4 4 8-9"></path><path d="M15 6h6v6"></path>',
     clock: '<circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3.5 2"></path>',
     filter: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5L4 5Z"></path>',
-    arrowDown: '<path d="M12 4v13.5"></path><path d="M6.5 13l5.5 5.5 5.5-5.5"></path>'
+    arrowDown: '<path d="M12 4v13.5"></path><path d="M6.5 13l5.5 5.5 5.5-5.5"></path>',
+    arrowDownSm: '<path d="M12 5v11"></path><path d="M7.5 12.5L12 17l4.5-4.5"></path>',
+    dollar: '<path d="M12 2.5v19"></path><path d="M16.5 6.5c0-1.8-2-3-4.5-3s-4.5 1.2-4.5 3 2 2.6 4.5 3 4.5 1.2 4.5 3-2 3-4.5 3-4.5-1.2-4.5-3"></path>',
+    check: '<path d="M5 12.5l5 5L19 7"></path>'
   };
   function icon(name){ return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || "") + "</svg>"; }
 
@@ -663,7 +695,11 @@
      UTILITÁRIOS DE AGREGAÇÃO
   ========================================================================= */
   function pct(num, den){ return den > 0 ? Math.round((num / den) * 100) : 0; }
+  function pct1(num, den){ return den > 0 ? (Math.round((num / den) * 1000) / 10).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "0,0"; }
   function sum(arr, fn){ return arr.reduce(function(a, x){ return a + fn(x); }, 0); }
+  function formatBRL(value){
+    return "R$ " + Math.round(value).toLocaleString("pt-BR");
+  }
 
   function resolveRange(state){
     if (state.exactDate){ return { start: state.exactDate, end: state.exactDate }; }
@@ -723,15 +759,48 @@
   function computeFunnel(leads){
     // Acompanha a MESMA base de leads ao longo das etapas (não são totais
     // independentes por etapa), por isso o funil é sempre decrescente.
-    return [
-      { key: "leads", label: "Leads", value: leads.length },
-      { key: "contatados", label: "Contatados", value: leads.filter(function(l){ return l.contatado; }).length },
-      { key: "mql", label: "MQL", value: leads.filter(function(l){ return l.mql; }).length },
-      { key: "agendados", label: "Agendados", value: leads.filter(function(l){ return !!l.call; }).length },
-      { key: "realizadas", label: "Calls realizadas", value: leads.filter(function(l){ return l.call && l.call.realizada; }).length },
-      { key: "propostas", label: "Propostas", value: leads.filter(function(l){ return l.call && l.call.proposta; }).length },
-      { key: "vendas", label: "Vendas", value: leads.filter(function(l){ return l.call && l.call.venda; }).length }
+    var totalLeads = leads.length;
+    var contatados = leads.filter(function(l){ return l.contatado; }).length;
+    var mql = leads.filter(function(l){ return l.mql; }).length;
+    var agendados = leads.filter(function(l){ return !!l.call; }).length;
+    var realizadas = leads.filter(function(l){ return l.call && l.call.realizada; }).length;
+    var propostas = leads.filter(function(l){ return l.call && l.call.proposta; }).length;
+    var vendasLeads = leads.filter(function(l){ return l.call && l.call.venda; });
+    var vendas = vendasLeads.length;
+
+    var receita = sum(vendasLeads, function(l){ return l.call.valor || 0; });
+    var ticketMedio = vendas > 0 ? receita / vendas : 0;
+
+    var comCall = leads.filter(function(l){ return l.call && l.call.data; });
+    var ciclo = comCall.length > 0
+      ? sum(comCall, function(l){
+          var d1 = new Date(l.data + "T00:00:00");
+          var d2 = new Date(l.call.data + "T00:00:00");
+          return Math.max(0, Math.round((d2 - d1) / 86400000));
+        }) / comCall.length
+      : 0;
+
+    var stages = [
+      { key: "leads", label: "Leads Totais", value: totalLeads, dot: "blue", accent: false },
+      { key: "contatados", label: "Contatados", value: contatados, dot: "blue", accent: true },
+      { key: "mql", label: "MQL Qualificados", value: mql, dot: "orange", accent: false },
+      { key: "agendados", label: "Agendamentos", value: agendados, dot: "blue", accent: true },
+      { key: "realizadas", label: "Calls Realizadas", value: realizadas, dot: "purple", accent: false },
+      { key: "propostas", label: "Propostas na Mesa", value: propostas, dot: "blue", accent: false },
+      { key: "vendas", label: "Vendas Fechadas", value: vendas, dot: null, accent: false, final: true }
     ];
+    var badgeLabels = ["contato", "qualificação", "agendamento", "comparecimento", "proposta", "fechamento"];
+
+    return {
+      stages: stages,
+      badgeLabels: badgeLabels,
+      totalLeads: totalLeads,
+      vendas: vendas,
+      receita: receita,
+      ticketMedio: ticketMedio,
+      ciclo: Math.round(ciclo * 10) / 10,
+      conversaoGeral: pct1(vendas, totalLeads)
+    };
   }
 
   /* =========================================================================
@@ -850,38 +919,74 @@
   }
 
   function renderFunnel(leads){
-    var stages = computeFunnel(leads);
+    var data = computeFunnel(leads);
+    var stages = data.stages;
+
+    var summary = document.getElementById("funnelSummary");
+    summary.className = "funnel-summary";
+    summary.innerHTML =
+      '<div class="funnel-summary-item">' +
+        '<div class="funnel-summary-icon blue">' + icon("trendUp") + '</div>' +
+        '<div><div class="funnel-summary-label">Taxa de Conversão Geral</div>' +
+          '<div class="funnel-summary-value num">' + data.conversaoGeral + '%<span class="small">(' + data.totalLeads + ' → ' + data.vendas + ' vendas)</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="funnel-summary-divider"></div>' +
+      '<div class="funnel-summary-item">' +
+        '<div class="funnel-summary-icon green">' + icon("dollar") + '</div>' +
+        '<div><div class="funnel-summary-label">Receita Total</div>' +
+          '<div class="funnel-summary-value green num">' + formatBRL(data.receita) + '</div>' +
+        '</div>' +
+      '</div>';
+
     var holder = document.getElementById("funnelHolder");
     holder.innerHTML = "";
-    var maxValue = Math.max(1, stages[0].value);
-
     stages.forEach(function(stage, i){
-      var row = el("div", { class: "funnel-row" });
-      row.appendChild(el("div", { class: "funnel-stage-label" }, stage.label));
+      var isFinal = !!stage.final;
+      var stageEl = el("div", { class: "funnel-stage" + (isFinal ? " final" : "") });
 
-      var widthPct = Math.max(pct(stage.value, maxValue), 6);
-      var mixPct = Math.round((i / Math.max(1, stages.length - 1)) * 100);
-      var track = el("div", { class: "funnel-track" });
-      var fill = el("div", {
-        class: "funnel-fill" + (mixPct < 45 ? " light" : ""),
-        style: "width:" + widthPct + "%; background:color-mix(in srgb, var(--accent-strong) " + mixPct + "%, var(--accent-soft));"
-      }, '<span class="val num">' + stage.value + "</span>");
-      track.appendChild(fill);
-      row.appendChild(track);
+      var left = el("div", { class: "funnel-stage-left" });
+      if (isFinal){
+        left.appendChild(el("div", { class: "funnel-stage-icon" }, icon("check")));
+      } else {
+        left.appendChild(el("div", { class: "funnel-dot " + stage.dot }));
+      }
+      left.appendChild(el("div", { class: "funnel-stage-label" }, stage.label));
+      stageEl.appendChild(left);
 
-      var meta = el("div", { class: "funnel-meta" }, '<b class="num">' + pct(stage.value, maxValue) + '%</b> do total');
-      row.appendChild(meta);
-      holder.appendChild(row);
+      if (isFinal){
+        var right = el("div", { class: "funnel-stage-right" },
+          '<span class="funnel-stage-value num">' + stage.value + '</span>' +
+          '<span class="funnel-revenue-pill num">' + formatBRL(data.receita) + '</span>');
+        stageEl.appendChild(right);
+      } else {
+        stageEl.appendChild(el("div", { class: "funnel-stage-value num" + (stage.accent ? " accent" : "") }, String(stage.value)));
+      }
+      holder.appendChild(stageEl);
 
       if (i < stages.length - 1){
         var next = stages[i + 1];
         var avancou = pct(next.value, stage.value);
-        var queda = Math.max(0, 100 - avancou);
-        var drop = el("div", { class: "funnel-drop" },
-          icon("arrowDown") + '<span><b class="num">' + avancou + '%</b> avançou para "' + next.label + '" · <b class="num">' + queda + '%</b> de queda</span>');
-        holder.appendChild(drop);
+        var badgeRow = el("div", { class: "funnel-badge-row" },
+          '<span class="funnel-badge">' + icon("arrowDownSm") + data.badgeLabels[i] + ' · <span class="num">' + avancou + '%</span></span>');
+        holder.appendChild(badgeRow);
       }
     });
+
+    var statsHolder = document.getElementById("funnelStats");
+    statsHolder.innerHTML =
+      '<div class="funnel-stat-card">' +
+        '<div class="funnel-stat-icon">' + icon("clock") + '</div>' +
+        '<div><div class="funnel-stat-label">Ciclo SDR → Closer</div>' +
+          '<div class="funnel-stat-value num">' + data.ciclo.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' dias</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="funnel-stat-card">' +
+        '<div class="funnel-stat-icon">' + icon("briefcase") + '</div>' +
+        '<div><div class="funnel-stat-label">Ticket Médio Venda</div>' +
+          '<div class="funnel-stat-value num">' + formatBRL(data.ticketMedio) + '</div>' +
+        '</div>' +
+      '</div>';
   }
 
   var WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
