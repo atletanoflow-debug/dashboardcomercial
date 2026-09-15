@@ -67,6 +67,29 @@
   .kpi-value{ font-size:1.7rem; font-weight:700; letter-spacing:-0.01em; }
   .kpi-sub{ font-size:.8rem; color:var(--text-muted); margin-top:4px; }
 
+  .funnel-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 22px 12px; box-shadow:var(--shadow); }
+  .funnel-row{ display:flex; align-items:center; gap:16px; }
+  .funnel-stage-label{ width:150px; flex-shrink:0; font-size:.88rem; font-weight:700; color:var(--text-primary); }
+  .funnel-track{ flex:1; background:var(--surface-alt); border-radius:var(--radius-sm); height:34px; position:relative; overflow:hidden; }
+  .funnel-fill{ height:100%; min-width:34px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:flex-end; padding-inline:12px; box-sizing:border-box; transition:width .2s; }
+  .funnel-fill .val{ color:#fff; font-weight:700; font-size:.85rem; white-space:nowrap; }
+  .funnel-fill.light .val{ color:var(--accent-strong); }
+  .funnel-meta{ width:120px; flex-shrink:0; text-align:right; font-size:.8rem; color:var(--text-muted); }
+  .funnel-meta b{ color:var(--text-primary); font-weight:700; }
+  .funnel-drop{ display:flex; align-items:center; gap:6px; font-size:.74rem; color:var(--text-muted); padding:6px 0 6px 166px; }
+  .funnel-drop svg{ width:12px; height:12px; flex-shrink:0; }
+  @media (max-width: 760px){
+    .funnel-stage-label{ width:104px; font-size:.8rem; }
+    .funnel-meta{ width:88px; }
+    .funnel-drop{ padding-left:120px; }
+  }
+  @media (max-width: 480px){
+    .funnel-row{ flex-wrap:wrap; }
+    .funnel-stage-label{ width:100%; }
+    .funnel-meta{ width:100%; text-align:left; }
+    .funnel-drop{ padding-left:0; }
+  }
+
   .agenda-summary{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
   .agenda-summary .kpi{ min-width:220px; flex:1; }
 
@@ -187,6 +210,14 @@
       <div class="field"><label for="filterDate">Data</label><input type="date" id="filterDate"></div>
     </div>
   </div>
+
+  <section class="panel" id="panel-funnel">
+    <div class="panel-head">
+      <h2>Funil de Conversão</h2>
+      <p class="desc">Jornada dos leads do primeiro contato até a venda, no período selecionado.</p>
+    </div>
+    <div class="funnel-card" id="funnelHolder"></div>
+  </section>
 
   <section class="panel" id="panel-sdr">
     <div class="panel-head">
@@ -623,7 +654,8 @@
     briefcase: '<rect x="3" y="8" width="18" height="11" rx="2"></rect><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 13h18"></path>',
     trendUp: '<path d="M3 17l6-6 4 4 8-9"></path><path d="M15 6h6v6"></path>',
     clock: '<circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3.5 2"></path>',
-    filter: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5L4 5Z"></path>'
+    filter: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5L4 5Z"></path>',
+    arrowDown: '<path d="M12 4v13.5"></path><path d="M6.5 13l5.5 5.5 5.5-5.5"></path>'
   };
   function icon(name){ return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || "") + "</svg>"; }
 
@@ -687,6 +719,19 @@
     var propostas = calls.filter(function(c){ return c.proposta; }).length;
     var vendas = calls.filter(function(c){ return c.venda; }).length;
     return { agendadas: agendadas, realizadas: realizadas, comparecimento: pct(realizadas, agendadas), noshow: Math.max(0, agendadas - realizadas), propostas: propostas, vendas: vendas, conversao: pct(vendas, realizadas) };
+  }
+  function computeFunnel(leads){
+    // Acompanha a MESMA base de leads ao longo das etapas (não são totais
+    // independentes por etapa), por isso o funil é sempre decrescente.
+    return [
+      { key: "leads", label: "Leads", value: leads.length },
+      { key: "contatados", label: "Contatados", value: leads.filter(function(l){ return l.contatado; }).length },
+      { key: "mql", label: "MQL", value: leads.filter(function(l){ return l.mql; }).length },
+      { key: "agendados", label: "Agendados", value: leads.filter(function(l){ return !!l.call; }).length },
+      { key: "realizadas", label: "Calls realizadas", value: leads.filter(function(l){ return l.call && l.call.realizada; }).length },
+      { key: "propostas", label: "Propostas", value: leads.filter(function(l){ return l.call && l.call.proposta; }).length },
+      { key: "vendas", label: "Vendas", value: leads.filter(function(l){ return l.call && l.call.venda; }).length }
+    ];
   }
 
   /* =========================================================================
@@ -802,6 +847,41 @@
     holder.appendChild(kpiCard("Propostas na mesa", m.propostas, null, "briefcase"));
     holder.appendChild(kpiCard("Vendas realizadas", m.vendas, null, "trendUp"));
     holder.appendChild(kpiCard("Taxa de conversão", m.conversao + "%", m.vendas + " de " + m.realizadas + " realizadas", "target"));
+  }
+
+  function renderFunnel(leads){
+    var stages = computeFunnel(leads);
+    var holder = document.getElementById("funnelHolder");
+    holder.innerHTML = "";
+    var maxValue = Math.max(1, stages[0].value);
+
+    stages.forEach(function(stage, i){
+      var row = el("div", { class: "funnel-row" });
+      row.appendChild(el("div", { class: "funnel-stage-label" }, stage.label));
+
+      var widthPct = Math.max(pct(stage.value, maxValue), 6);
+      var mixPct = Math.round((i / Math.max(1, stages.length - 1)) * 100);
+      var track = el("div", { class: "funnel-track" });
+      var fill = el("div", {
+        class: "funnel-fill" + (mixPct < 45 ? " light" : ""),
+        style: "width:" + widthPct + "%; background:color-mix(in srgb, var(--accent-strong) " + mixPct + "%, var(--accent-soft));"
+      }, '<span class="val num">' + stage.value + "</span>");
+      track.appendChild(fill);
+      row.appendChild(track);
+
+      var meta = el("div", { class: "funnel-meta" }, '<b class="num">' + pct(stage.value, maxValue) + '%</b> do total');
+      row.appendChild(meta);
+      holder.appendChild(row);
+
+      if (i < stages.length - 1){
+        var next = stages[i + 1];
+        var avancou = pct(next.value, stage.value);
+        var queda = Math.max(0, 100 - avancou);
+        var drop = el("div", { class: "funnel-drop" },
+          icon("arrowDown") + '<span><b class="num">' + avancou + '%</b> avançou para "' + next.label + '" · <b class="num">' + queda + '%</b> de queda</span>');
+        holder.appendChild(drop);
+      }
+    });
   }
 
   var WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
@@ -1042,6 +1122,7 @@
     var leads = filterLeads(DataSource.getLeads(), state, range);
     var calls = filterCalls(DataSource.getCalls(), state, range);
 
+    renderFunnel(leads);
     renderSDR(leads);
     renderFollowUp(leads);
     renderCloser(calls);
