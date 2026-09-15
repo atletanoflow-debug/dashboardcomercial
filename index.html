@@ -80,24 +80,28 @@
   .funnel-summary-divider{ width:1px; align-self:stretch; background:var(--border); }
 
   .funnel-pyramid{ display:flex; flex-direction:column; align-items:center; gap:0; padding:8px 0 4px; }
-  .funnel-stage{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:22px; width:100%; }
+  .funnel-stage{ background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius); padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:22px; max-width:100%; box-sizing:border-box; transition:width .15s; }
   .funnel-stage-left{ display:flex; align-items:center; gap:10px; }
-  .funnel-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .funnel-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
   .funnel-dot.blue{ background:var(--accent); }
   .funnel-dot.orange{ background:#c98a2c; }
   .funnel-dot.purple{ background:#7a5cb8; }
-  .funnel-stage-label{ font-size:.92rem; font-weight:700; color:var(--text-primary); }
-  .funnel-stage-value{ font-size:1.25rem; font-weight:700; letter-spacing:-0.01em; color:var(--text-primary); }
+  .funnel-stage-label{ font-size:.88rem; font-weight:700; color:var(--text-primary); }
+  .funnel-stage-value{ font-size:1.2rem; font-weight:700; letter-spacing:-0.01em; color:var(--text-primary); }
   .funnel-stage-value.accent{ color:var(--accent-strong); }
-  .funnel-stage.final{ background:#e8f5ec; border-color:#bfe3cc; }
+  .funnel-stage.highlight{ background:var(--surface); border:2px solid var(--accent); }
+  .funnel-stage.highlight .funnel-stage-value{ color:var(--accent-strong); font-size:1.3rem; }
+  .funnel-stage.final{ flex-direction:column; text-align:center; background:#e8f5ec; border-color:#bfe3cc; padding:20px 22px; gap:6px; }
+  .funnel-stage.final .funnel-stage-left{ flex-direction:column; gap:6px; }
+  .funnel-stage.final .funnel-dot{ display:none; }
   .funnel-stage.final .funnel-stage-label{ color:#1a6b3c; }
-  .funnel-stage.final .funnel-stage-icon{ width:30px; height:30px; border-radius:50%; background:#1f8a4c; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .funnel-stage.final .funnel-stage-icon svg{ width:16px; height:16px; }
-  .funnel-stage.final .funnel-stage-right{ display:flex; align-items:center; gap:12px; }
-  .funnel-stage.final .funnel-stage-value{ color:#1a6b3c; font-size:1.4rem; }
+  .funnel-stage.final .funnel-stage-icon{ width:34px; height:34px; border-radius:50%; background:#1f8a4c; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .funnel-stage.final .funnel-stage-icon svg{ width:17px; height:17px; }
+  .funnel-stage.final .funnel-stage-right{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .funnel-stage.final .funnel-stage-value{ color:#1a6b3c; font-size:1.6rem; }
   .funnel-revenue-pill{ background:#fff; border:1px solid #bfe3cc; color:#1a6b3c; font-weight:700; font-size:.82rem; padding:6px 14px; border-radius:999px; white-space:nowrap; }
   .funnel-badge-row{ display:flex; align-items:center; justify-content:center; padding:6px 0; }
-  .funnel-badge{ display:inline-flex; align-items:center; gap:6px; background:#1f8a4c; color:#fff; font-size:.74rem; font-weight:700; padding:5px 14px; border-radius:999px; white-space:nowrap; }
+  .funnel-badge{ display:inline-flex; align-items:center; gap:5px; background:#eef8f1; border:1px solid #bfe3cc; color:#1a6b3c; font-size:.72rem; font-weight:700; padding:5px 13px; border-radius:999px; white-space:nowrap; }
   .funnel-badge svg{ width:11px; height:11px; }
 
   .funnel-stats-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:18px; }
@@ -943,7 +947,12 @@
     holder.innerHTML = "";
     stages.forEach(function(stage, i){
       var isFinal = !!stage.final;
-      var stageEl = el("div", { class: "funnel-stage" + (isFinal ? " final" : "") });
+      var isHighlight = stage.key === "propostas";
+      var widthPct = Math.max(58, 100 - i * 6);
+      var stageEl = el("div", {
+        class: "funnel-stage" + (isFinal ? " final" : "") + (isHighlight ? " highlight" : ""),
+        style: "width:" + widthPct + "%;"
+      });
 
       var left = el("div", { class: "funnel-stage-left" });
       if (isFinal){
@@ -951,7 +960,7 @@
       } else {
         left.appendChild(el("div", { class: "funnel-dot " + stage.dot }));
       }
-      left.appendChild(el("div", { class: "funnel-stage-label" }, stage.label));
+      left.appendChild(el("div", { class: "funnel-stage-label" }, (i + 1) + ". " + stage.label));
       stageEl.appendChild(left);
 
       if (isFinal){
@@ -968,7 +977,7 @@
         var next = stages[i + 1];
         var avancou = pct(next.value, stage.value);
         var badgeRow = el("div", { class: "funnel-badge-row" },
-          '<span class="funnel-badge">' + icon("arrowDownSm") + data.badgeLabels[i] + ' · <span class="num">' + avancou + '%</span></span>');
+          '<span class="funnel-badge">' + icon("arrowDownSm") + '<span class="num">' + avancou + '%</span> ' + data.badgeLabels[i] + '</span>');
         holder.appendChild(badgeRow);
       }
     });
