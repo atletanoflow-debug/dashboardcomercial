@@ -336,12 +336,11 @@
   var FOLLOWUPS = ["Camila Rocha", "Thiago Martins"];
   // Cada closer pode ser adicionada aqui sem alterar mais nada no código.
   var CLOSERS_META = [
-    { name: "Ana Paula" },
-    { name: "Bruna Costa" },
-    { name: "Carla Mendes" }
+    { name: "Beatriz" },
+    { name: "Thais" }
   ];
   var ORIGENS = ["Instagram", "Indicação", "Anúncio", "Site", "WhatsApp"];
-  var FIRST_NAMES = ["Lucas","Mariana","Pedro","Julia","Gabriel","Larissa","Matheus","Beatriz","Felipe","Camila","Rafael","Amanda","Bruno","Fernanda","Gustavo","Isabela","Vinicius","Leticia","Thiago","Carolina"];
+  var FIRST_NAMES = ["Lucas","Mariana","Pedro","Julia","Gabriel","Larissa","Matheus","Renata","Felipe","Camila","Rafael","Amanda","Bruno","Fernanda","Gustavo","Isabela","Vinicius","Leticia","Thiago","Carolina"];
   var LAST_NAMES = ["Silva","Santos","Oliveira","Souza","Costa","Pereira","Almeida","Ferreira","Rodrigues","Carvalho","Gomes","Ribeiro","Martins","Araujo","Barbosa"];
 
   /* -------- geração determinística dos leads (registro por lead) -------- */
@@ -431,9 +430,8 @@
 
   /* -------- dados simulados de agenda, usados apenas para closers que ainda não conectaram -------- */
   var BASE_WEEK_PATTERN = {
-    "Ana Paula":   [4, 6, 5, 3, 7, 2, 0],
-    "Bruna Costa": [3, 4, 6, 5, 4, 1, 0],
-    "Carla Mendes":[5, 3, 4, 6, 5, 0, 0]
+    "Beatriz": [4, 6, 5, 3, 7, 2, 0],
+    "Thais":   [3, 4, 6, 5, 4, 1, 0]
   };
   function weekOffsetOf(date){
     var diffDays = Math.round((weekStart(date) - weekStart(TODAY)) / 86400000);
