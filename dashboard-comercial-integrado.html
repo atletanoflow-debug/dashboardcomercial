@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Comercial</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#f4f6f9;
+    --surface:#ffffff;
+    --surface-alt:#f6f8fa;
+    --border:#e2e6eb;
+    --border-strong:#cbd2da;
+    --text-primary:#12161b;
+    --text-secondary:#5b6470;
+    --text-muted:#8a929d;
+    --accent:#2f6a86;
+    --accent-strong:#22384a;
+    --accent-soft:#e9f1f4;
+    --grid:#dde2e8;
+    --good:#1f8a4c;
+    --bad:#b23b3b;
+    --radius-lg:16px;
+    --radius:12px;
+    --radius-sm:9px;
+    --shadow:0 1px 2px rgba(15,23,32,0.04);
+    --font: Arial, Helvetica, "Segoe UI", system-ui, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  body{ background:var(--bg); color:var(--text-primary); font-family:var(--font); margin:0; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:1180px; margin:0 auto; padding-inline:20px; padding-block:28px 64px; }
+  h1,h2,h3{ text-wrap:balance; margin:0; }
+  .num{ font-variant-numeric: tabular-nums; }
+  svg.icon{ width:18px; height:18px; color:var(--text-muted); flex-shrink:0; }
+
+  .topbar{ display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:22px; }
+  .topbar h1{ font-size:2rem; font-weight:700; letter-spacing:-0.01em; }
+  .topbar .date-label{ font-size:.95rem; color:var(--text-muted); margin-top:4px; }
+  .demo-badge{ font-size:.78rem; color:var(--text-secondary); border:1px solid var(--border); background:var(--surface); border-radius:999px; padding:7px 14px; white-space:nowrap; }
+
+  .controls{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 18px 20px; box-shadow:var(--shadow); margin-bottom:32px; display:flex; flex-direction:column; gap:16px; }
+  .controls-eyebrow{ display:flex; align-items:center; gap:7px; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); }
+  .controls-eyebrow svg{ width:14px; height:14px; }
+  .period-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .pill{ border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); font:inherit; font-size:.86rem; font-weight:500; padding:8px 16px; border-radius:999px; cursor:pointer; transition:background .12s, color .12s, border-color .12s; }
+  .pill:hover{ border-color:var(--border-strong); }
+  .pill.active{ background:var(--accent-strong); border-color:var(--accent-strong); color:#fff; }
+  .custom-range{ display:none; align-items:center; gap:8px; flex-wrap:wrap; }
+  .custom-range.show{ display:flex; }
+  .custom-range label{ font-size:.82rem; color:var(--text-secondary); }
+
+  .filter-row{ display:grid; grid-template-columns:repeat(5,minmax(120px,1fr)); gap:14px; border-top:1px solid var(--border); padding-top:16px; }
+  .field{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .field label{ font-size:.83rem; font-weight:500; color:var(--text-secondary); }
+  select, input[type="date"]{ font:inherit; font-size:.9rem; color:var(--text-primary); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 10px; width:100%; }
+  select:focus, input:focus, button:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+
+  .panel{ margin-bottom:38px; }
+  .panel-head h2{ font-size:1.3rem; font-weight:700; margin-bottom:4px; }
+  .panel-head p.desc{ font-size:.88rem; color:var(--text-muted); margin:0 0 16px; }
+
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:14px; }
+  .kpi{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); }
+  .kpi-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .kpi-label{ font-size:.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+  .kpi-value{ font-size:1.7rem; font-weight:700; letter-spacing:-0.01em; }
+  .kpi-sub{ font-size:.8rem; color:var(--text-muted); margin-top:4px; }
+
+  .agenda-summary{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+  .agenda-summary .kpi{ min-width:220px; flex:1; }
+
+  .closer-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .closer-row{ display:flex; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 18px; cursor:pointer; font:inherit; color:inherit; text-align:left; transition:border-color .12s, box-shadow .12s; flex-wrap:wrap; }
+  .closer-row:hover{ border-color:var(--border-strong); }
+  .closer-row.selected{ border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .closer-row .who{ display:flex; flex-direction:column; gap:4px; min-width:190px; flex:1; }
+  .closer-row .name{ font-weight:700; font-size:.98rem; }
+  .closer-row .conn{ display:flex; align-items:center; gap:6px; font-size:.8rem; color:var(--text-muted); }
+  .status-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .status-dot.on{ background:#2f9e5c; }
+  .status-dot.off{ background:var(--text-muted); }
+  .status-dot.err{ background:var(--bad); }
+  .closer-row .stats{ display:flex; gap:28px; }
+  .closer-row .stats div{ text-align:center; }
+  .closer-row .stats .lbl{ font-size:.74rem; color:var(--text-muted); margin-bottom:2px; }
+  .closer-row .stats .val{ font-size:1.1rem; font-weight:700; }
+  .connect-btn{ border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); font:inherit; font-size:.82rem; padding:8px 14px; border-radius:var(--radius-sm); cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+  .connect-btn:hover{ border-color:var(--border-strong); }
+  .connect-btn.is-connected{ color:var(--good); border-color:var(--good); }
+  .connect-btn:disabled{ opacity:.6; cursor:progress; }
+  .connect-btn svg{ width:15px; height:15px; }
+
+  .detail-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow); margin-bottom:18px; }
+  .detail-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .detail-head h3{ font-size:1.05rem; font-weight:700; }
+  .detail-head button{ border:none; background:none; color:var(--accent); font:inherit; font-size:.85rem; cursor:pointer; padding:0; }
+  .detail-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:14px; margin-bottom:16px; }
+  .detail-stats .lbl{ font-size:.82rem; color:var(--text-muted); margin-bottom:4px; }
+  .detail-stats .val{ font-size:1.4rem; font-weight:700; }
+  .detail-days{ display:grid; grid-template-columns:repeat(7,1fr); gap:10px; margin-bottom:18px; }
+  .detail-day{ border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 6px; text-align:center; background:var(--surface-alt); }
+  .detail-day .lbl{ font-size:.7rem; color:var(--text-muted); font-weight:700; letter-spacing:.03em; margin-bottom:6px; }
+  .detail-day .val{ font-size:1.15rem; font-weight:700; }
+
+  .rule-card{ border:1px dashed var(--border-strong); border-radius:var(--radius); padding:16px 18px; background:var(--surface-alt); }
+  .rule-card .rule-title{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:.95rem; margin-bottom:8px; }
+  .rule-card .rule-title svg{ width:16px; height:16px; color:var(--text-muted); }
+  .rule-card p{ font-size:.85rem; color:var(--text-secondary); margin:0 0 10px; line-height:1.5; }
+  .rule-def{ display:flex; flex-direction:column; gap:5px; font-size:.85rem; color:var(--text-secondary); }
+  .rule-def b{ color:var(--text-primary); font-weight:700; }
+
+  .table-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); box-shadow:var(--shadow); }
+  table{ border-collapse:collapse; width:100%; min-width:560px; font-size:.88rem; }
+  thead th{ text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted); font-weight:700; padding:12px 14px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  thead th.num-col, tbody td.num-col{ text-align:center; }
+  tbody td{ padding:11px 14px; border-bottom:1px solid var(--border); color:var(--text-secondary); white-space:nowrap; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:nth-child(even){ background:var(--surface-alt); }
+  td.rowlabel{ color:var(--text-primary); font-weight:700; }
+  td.total, th.total{ font-weight:700; color:var(--text-primary); }
+
+  table.ranking thead th{ text-transform:none; letter-spacing:normal; font-size:.85rem; color:var(--text-secondary); }
+  th.sortable{ cursor:pointer; user-select:none; }
+  th.sortable:hover{ color:var(--text-primary); }
+  th.sortable.active{ color:var(--text-primary); font-weight:700; }
+  th.sortable .arrow{ margin-left:3px; color:var(--accent); }
+
+  .chart-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px 10px; box-shadow:var(--shadow); }
+  .chart-toolbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-bottom:4px; flex-wrap:wrap; }
+  .chart-toolbar .field{ width:210px; }
+  .bar-label{ font-size:.72rem; fill:var(--text-muted); font-family:var(--font); }
+  .bar-value{ font-size:.74rem; fill:var(--text-primary); font-weight:700; font-family:var(--font); }
+  .axis-label{ font-size:.72rem; fill:var(--text-muted); font-family:var(--font); }
+  .grid-line{ stroke:var(--grid); stroke-width:1; stroke-dasharray:3 4; }
+  .axis-line{ stroke:var(--border-strong); stroke-width:1; }
+
+  .footnote{ font-size:.8rem; color:var(--text-muted); margin-top:12px; line-height:1.5; }
+
+  .banner{ display:flex; gap:10px; align-items:flex-start; border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; font-size:.85rem; margin-bottom:18px; }
+  .banner.error{ background:#fdefef; border-color:#f0c9c9; color:var(--bad); }
+  .banner.info{ background:var(--accent-soft); color:var(--accent-strong); }
+
+  @media (max-width: 760px){
+    .filter-row{ grid-template-columns:repeat(2,1fr); }
+    .agenda-summary .kpi{ min-width:0; }
+    .closer-row{ justify-content:space-between; }
+    .detail-days{ grid-template-columns:repeat(4,1fr); }
+  }
+  @media (max-width: 480px){
+    .filter-row{ grid-template-columns:1fr 1fr; }
+    .topbar{ flex-direction:column; align-items:flex-start; }
+    .detail-days{ grid-template-columns:repeat(3,1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <h1>Dashboard Comercial</h1>
+      <div class="date-label" id="todayLabel"></div>
+    </div>
+    <div class="demo-badge">SDR/Follow-up: dados de demonstração · Agenda: Google Calendar real</div>
+  </div>
+
+  <div id="googleBanner"></div>
+
+  <div class="controls">
+    <div class="controls-eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16l-6 7.5V19l-4 2v-8.5L4 5Z"></path></svg>
+      Período e filtros
+    </div>
+    <div class="period-row" id="periodRow"></div>
+    <div class="custom-range" id="customRange">
+      <label for="customStart">de</label>
+      <input type="date" id="customStart">
+      <label for="customEnd">até</label>
+      <input type="date" id="customEnd">
+    </div>
+    <div class="filter-row">
+      <div class="field"><label for="filterResponsavel">Responsável</label><select id="filterResponsavel"></select></div>
+      <div class="field"><label for="filterSDR">SDR</label><select id="filterSDR"></select></div>
+      <div class="field"><label for="filterCloser">Closer</label><select id="filterCloser"></select></div>
+      <div class="field"><label for="filterOrigem">Origem do lead</label><select id="filterOrigem"></select></div>
+      <div class="field"><label for="filterDate">Data</label><input type="date" id="filterDate"></div>
+    </div>
+  </div>
+
+  <section class="panel" id="panel-sdr">
+    <div class="panel-head">
+      <h2>SDR</h2>
+      <p class="desc">Prospecção e qualificação no período selecionado.</p>
+    </div>
+    <div class="kpi-grid" id="sdrCards"></div>
+  </section>
+
+  <section class="panel" id="panel-followup">
+    <div class="panel-head">
+      <h2>Follow-up</h2>
+      <p class="desc">Retomada de contato com leads sem agendamento.</p>
+    </div>
+    <div class="kpi-grid" id="followCards"></div>
+  </section>
+
+  <section class="panel" id="panel-closer">
+    <div class="panel-head">
+      <h2>Closer</h2>
+      <p class="desc">Calls agendadas dentro do período selecionado.</p>
+    </div>
+    <div class="kpi-grid" id="closerCards"></div>
+  </section>
+
+  <section class="panel" id="panel-agenda">
+    <div class="panel-head">
+      <h2>Agenda das Closers</h2>
+      <p class="desc">Distribuição das calls na semana atual. Conecte a agenda de cada closer com a conta Google dela. Clique no nome para ver a visão individual.</p>
+    </div>
+
+    <div class="agenda-summary">
+      <div class="kpi"><div class="kpi-label">Total de calls da equipe hoje</div><div class="kpi-value num" id="agendaTotalHoje" style="margin-top:8px;">–</div></div>
+      <div class="kpi"><div class="kpi-label">Total de calls da equipe na semana</div><div class="kpi-value num" id="agendaTotalSemana" style="margin-top:8px;">–</div></div>
+    </div>
+
+    <div id="closerListHolder" class="closer-list"></div>
+
+    <div id="detailCard" class="detail-card" style="display:none;">
+      <div class="detail-head">
+        <h3 id="detailTitle"></h3>
+        <button type="button" id="detailClose">Fechar</button>
+      </div>
+      <div class="detail-stats" id="detailStats"></div>
+      <div class="detail-days" id="detailDays"></div>
+      <div class="rule-card">
+        <div class="rule-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M12 18v3M4.2 6.2l2.1 2.1M17.7 15.7l2.1 2.1M3 12h3M18 12h3M4.2 17.8l2.1-2.1M17.7 8.3l2.1-2.1"></path><circle cx="12" cy="12" r="3.2"></circle></svg>
+          Regra para identificar calls comerciais na agenda
+        </div>
+        <p id="ruleIntro"></p>
+        <div class="rule-def" id="ruleDef"></div>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table id="agendaTable"></table>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-weekly">
+    <div class="panel-head">
+      <h2>Calls por dia da semana</h2>
+      <p class="desc">Semana atual, com base nas calls agendadas.</p>
+    </div>
+    <div class="chart-card">
+      <div class="chart-toolbar">
+        <div class="field"><select id="chartCloserSelect"></select></div>
+      </div>
+      <svg id="weeklyChart" viewBox="0 0 700 250" width="100%" style="display:block;"></svg>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-ranking">
+    <div class="panel-head">
+      <h2>Performance por Closer</h2>
+      <p class="desc">Clique nos títulos para ordenar.</p>
+    </div>
+    <div class="table-scroll">
+      <table id="rankingTable" class="ranking"></table>
+    </div>
+  </section>
+
+  <p class="footnote">SDR, Follow-up, Closer e Ranking continuam usando dados fictícios de demonstração, prontos para serem substituídos por uma planilha no futuro. A Agenda das Closers já está conectada de verdade ao Google Calendar: cada closer autoriza o acesso à própria agenda com a conta Google dela, e os eventos reais entram nos cálculos assim que passam pela regra de classificação de "call comercial".</p>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================================
+     CONFIGURAÇÃO DA INTEGRAÇÃO COM O GOOGLE CALENDAR
+     -------------------------------------------------------------------------
+     Client ID criado no Google Cloud Console (projeto "Dashboard Comercial AF").
+     Para funcionar, a origem de onde este arquivo é aberto (ex: o domínio do
+     GitHub Pages/Netlify que hospeda este HTML) precisa estar cadastrada em
+     "Origens JavaScript autorizadas" nas credenciais desse Client ID.
+  ========================================================================= */
+  var GOOGLE_CLIENT_ID = "950622027639-h0dket2gn6evngnil06l4i7kcee0s33q.apps.googleusercontent.com";
+  var GOOGLE_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+
+  // Regra que decide quais eventos da agenda contam como "call comercial".
+  var CALL_RULE = {
+    keywords: ["call", "reunião", "reuniao", "diagnóstico", "diagnostico", "apresentação", "apresentacao"],
+    minDurationMinutes: 20,
+    requireAttendee: true,
+    ignoreAllDay: true
+  };
+
+  /* =========================================================================
+     CAMADA DE DADOS
+     -------------------------------------------------------------------------
+     Duas fontes independentes, cada uma com um único ponto de entrada:
+       - DataSource.getLeads()      -> registros comerciais (futura PLANILHA)
+       - CalendarSource.getEvents() -> eventos de agenda (Google Calendar real
+                                       para closers conectadas, simulado para
+                                       as demais, até que todas conectem)
+     Todo o restante do dashboard (cards, filtros, gráficos, tabelas) consome
+     apenas essas duas funções.
+  ========================================================================= */
+
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function randInt(rng, min, max){ return Math.floor(rng() * (max - min + 1)) + min; }
+  function chance(rng, p){ return rng() < p; }
+  function choice(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
+
+  function ymd(d){
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function addDays(d, n){ var r = new Date(d); r.setDate(r.getDate() + n); return r; }
+  function isoDow(d){ return (d.getDay() + 6) % 7; } // 0 = segunda ... 6 = domingo
+  function weekStart(d){ return addDays(d, -isoDow(d)); }
+
+  var TODAY = new Date(2026, 8, 15); // 15/09/2026 — "hoje" fixo para esta demonstração
+
+  var RESPONSAVEIS = ["Marcos Duarte", "Fernanda Reis"];
+  var SDRS = ["Rafael Souza", "Bianca Lima", "Diego Alves"];
+  var SDR_RESPONSAVEL = { "Rafael Souza": "Marcos Duarte", "Diego Alves": "Marcos Duarte", "Bianca Lima": "Fernanda Reis" };
+  var FOLLOWUPS = ["Camila Rocha", "Thiago Martins"];
+  // Cada closer pode ser adicionada aqui sem alterar mais nada no código.
+  var CLOSERS_META = [
+    { name: "Ana Paula" },
+    { name: "Bruna Costa" },
+    { name: "Carla Mendes" }
+  ];
+  var ORIGENS = ["Instagram", "Indicação", "Anúncio", "Site", "WhatsApp"];
+  var FIRST_NAMES = ["Lucas","Mariana","Pedro","Julia","Gabriel","Larissa","Matheus","Beatriz","Felipe","Camila","Rafael","Amanda","Bruno","Fernanda","Gustavo","Isabela","Vinicius","Leticia","Thiago","Carolina"];
+  var LAST_NAMES = ["Silva","Santos","Oliveira","Souza","Costa","Pereira","Almeida","Ferreira","Rodrigues","Carvalho","Gomes","Ribeiro","Martins","Araujo","Barbosa"];
+
+  /* -------- geração determinística dos leads (registro por lead) -------- */
+  var MOCK_LEADS = [];
+  var MOCK_CALLS = [];
+  (function generateLeads(){
+    var rng = mulberry32(20260915);
+    var closerIdx = 0;
+    var leadSeq = 0;
+    for (var i = 59; i >= 0; i--){
+      var date = addDays(TODAY, -i);
+      var dow = date.getDay();
+      var count;
+      if (dow === 0) count = randInt(rng, 0, 3);
+      else if (dow === 6) count = randInt(rng, 2, 6);
+      else count = randInt(rng, 8, 16);
+
+      for (var k = 0; k < count; k++){
+        leadSeq++;
+        var sdr = choice(rng, SDRS);
+        var responsavel = SDR_RESPONSAVEL[sdr];
+        var origem = choice(rng, ORIGENS);
+        var lead = {
+          id: "L" + leadSeq, data: ymd(date),
+          lead: choice(rng, FIRST_NAMES) + " " + choice(rng, LAST_NAMES),
+          origem: origem, responsavel: responsavel, sdr: sdr, closer: null,
+          status: "Novo", contatado: false, contatoSLA: false, mql: false,
+          ligacoesFeitas: 0, ligacoesAtendidas: 0,
+          naoAtendidaRespondeu: false, naoAtendidaNaoResponde: false,
+          agendamentoSDR: false, followUp: null, call: null
+        };
+
+        lead.contatado = chance(rng, 0.85);
+        if (lead.contatado){
+          lead.contatoSLA = chance(rng, 0.72);
+          lead.mql = chance(rng, 0.6);
+          lead.status = lead.mql ? "Qualificado" : "Contatado";
+        }
+        lead.ligacoesFeitas = lead.contatado ? randInt(rng, 1, 3) : randInt(rng, 0, 2);
+        if (lead.ligacoesFeitas > 0){
+          lead.ligacoesAtendidas = chance(rng, 0.8) ? lead.ligacoesFeitas : randInt(rng, 0, lead.ligacoesFeitas - 1);
+        }
+        if (lead.ligacoesFeitas > 0 && lead.ligacoesAtendidas === 0){
+          lead.naoAtendidaRespondeu = chance(rng, 0.4);
+          lead.naoAtendidaNaoResponde = !lead.naoAtendidaRespondeu;
+        }
+        lead.agendamentoSDR = lead.mql && chance(rng, 0.4);
+
+        var doFollowUp = lead.contatado && !lead.agendamentoSDR && chance(rng, 0.35);
+        if (doFollowUp){
+          var msgEnv = randInt(rng, 1, 3);
+          lead.followUp = {
+            responsavel: choice(rng, FOLLOWUPS),
+            ligacoesFeitas: randInt(rng, 1, 2), ligacoesAtendidas: 0,
+            mensagensEnviadas: msgEnv,
+            mensagensRespondidas: chance(rng, 0.55) ? randInt(rng, 1, msgEnv) : 0,
+            agendamentoRealizado: chance(rng, 0.3)
+          };
+          lead.followUp.ligacoesAtendidas = chance(rng, 0.6) ? lead.followUp.ligacoesFeitas : randInt(rng, 0, lead.followUp.ligacoesFeitas - 1);
+        }
+
+        var hasCall = lead.agendamentoSDR || (lead.followUp && lead.followUp.agendamentoRealizado);
+        if (hasCall){
+          var closerMeta = CLOSERS_META[closerIdx % CLOSERS_META.length];
+          closerIdx++;
+          lead.closer = closerMeta.name;
+          lead.status = "Agendado";
+          var callDate = addDays(date, randInt(rng, 1, 4));
+          var callYmd = ymd(callDate);
+          var isFuture = callDate.getTime() > TODAY.getTime();
+          var realizada = isFuture ? false : chance(rng, 0.78);
+          var proposta = realizada && chance(rng, 0.55);
+          var venda = proposta && chance(rng, 0.4);
+          if (!isFuture) lead.status = venda ? "Cliente" : (realizada ? "Sem venda" : "No-show");
+          lead.call = { data: callYmd, agendada: true, realizada: realizada, proposta: proposta, venda: venda, pendente: isFuture };
+          MOCK_CALLS.push({ closer: closerMeta.name, sdr: sdr, responsavel: responsavel, origem: origem, data: callYmd, realizada: realizada, proposta: proposta, venda: venda });
+        }
+        MOCK_LEADS.push(lead);
+      }
+    }
+  })();
+
+  var DataSource = {
+    getLeads: function(){ return MOCK_LEADS; },
+    getCalls: function(){ return MOCK_CALLS; }
+  };
+
+  /* -------- dados simulados de agenda, usados apenas para closers que ainda não conectaram -------- */
+  var BASE_WEEK_PATTERN = {
+    "Ana Paula":   [4, 6, 5, 3, 7, 2, 0],
+    "Bruna Costa": [3, 4, 6, 5, 4, 1, 0],
+    "Carla Mendes":[5, 3, 4, 6, 5, 0, 0]
+  };
+  function weekOffsetOf(date){
+    var diffDays = Math.round((weekStart(date) - weekStart(TODAY)) / 86400000);
+    return Math.round(diffDays / 7);
+  }
+  function simulatedCallsForDay(closerName, date){
+    var pattern = BASE_WEEK_PATTERN[closerName] || [3, 4, 4, 3, 3, 1, 0];
+    var base = pattern[isoDow(date)];
+    var offset = weekOffsetOf(date);
+    if (offset === 0) return base;
+    var seed = Math.abs(offset) * 977 + closerName.length * 131 + isoDow(date) * 7 + 42;
+    var rng = mulberry32(seed);
+    return Math.max(0, base + randInt(rng, -2, 2));
+  }
+
+  /* =========================================================================
+     INTEGRAÇÃO REAL COM O GOOGLE CALENDAR
+     -------------------------------------------------------------------------
+     Cada closer conecta com a PRÓPRIA conta Google. O token fica só na
+     memória/armazenamento local deste navegador, nunca é enviado para
+     nenhum servidor além do próprio Google, e expira em ~1h (basta clicar
+     em "Reconectar" quando isso acontecer).
+  ========================================================================= */
+  var GOOGLE_READY = false;
+  var googleTokenClient = null;
+  var connections = {}; // closerName -> { token, expiresAt, email }
+  var eventCache = {};  // "closerName|rangeStart|rangeEnd" -> array de eventos já filtrados pela regra
+
+  try {
+    var savedConnKeys = JSON.parse(sessionStorage.getItem("gcal_connected_closers") || "[]");
+  } catch (e) { var savedConnKeys = []; }
+
+  function showGoogleBanner(kind, html){
+    var el = document.getElementById("googleBanner");
+    if (!kind){ el.innerHTML = ""; return; }
+    el.innerHTML = '<div class="banner ' + kind + '">' + html + "</div>";
+  }
+
+  function initGoogleClient(){
+    if (googleTokenClient || typeof google === "undefined" || !google.accounts) return googleTokenClient;
+    googleTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: GOOGLE_SCOPE,
+      prompt: "select_account",
+      callback: function(){}
+    });
+    GOOGLE_READY = true;
+    showGoogleBanner(null);
+    return googleTokenClient;
+  }
+  // A biblioteca do Google carrega de forma assíncrona; tenta inicializar
+  // assim que estiver disponível e avisa se ela não carregar.
+  var googleLoadTimer = setInterval(function(){
+    if (initGoogleClient()) clearInterval(googleLoadTimer);
+  }, 300);
+  setTimeout(function(){
+    if (!GOOGLE_READY){
+      clearInterval(googleLoadTimer);
+      showGoogleBanner("error", "Não foi possível carregar o login do Google (accounts.google.com). Verifique sua conexão com a internet e recarregue a página.");
+    }
+  }, 8000);
+
+  function isConnected(closerName){
+    var c = connections[closerName];
+    return !!(c && c.expiresAt > Date.now());
+  }
+
+  function connectCloser(closerName){
+    return new Promise(function(resolve, reject){
+      var client = initGoogleClient();
+      if (!client){ reject(new Error("google-not-loaded")); return; }
+      client.callback = function(resp){
+        if (resp.error){ reject(resp); return; }
+        connections[closerName] = { token: resp.access_token, expiresAt: Date.now() + (resp.expires_in - 60) * 1000 };
+        try {
+          var keys = Object.keys(connections);
+          sessionStorage.setItem("gcal_connected_closers", JSON.stringify(keys));
+        } catch (e) {}
+        eventCache = {}; // conexão nova invalida o cache de eventos
+        resolve(resp);
+      };
+      client.requestAccessToken();
+    });
+  }
+
+  function toRFC3339(dateStr, endOfDay){
+    var d = new Date(dateStr + "T" + (endOfDay ? "23:59:59" : "00:00:00"));
+    return d.toISOString();
+  }
+
+  function isEventACall(googleEvent){
+    if (CALL_RULE.ignoreAllDay && (!googleEvent.start || !googleEvent.start.dateTime)) return false;
+    var title = (googleEvent.summary || "").toLowerCase();
+    var hasKeyword = CALL_RULE.keywords.some(function(k){ return title.indexOf(k) !== -1; });
+    if (!hasKeyword) return false;
+    var start = new Date(googleEvent.start.dateTime);
+    var end = new Date(googleEvent.end.dateTime);
+    var durationMin = (end - start) / 60000;
+    if (durationMin < CALL_RULE.minDurationMinutes) return false;
+    if (CALL_RULE.requireAttendee && (!googleEvent.attendees || googleEvent.attendees.length === 0)) return false;
+    return true;
+  }
+
+  async function fetchRealEvents(closerName, rangeStart, rangeEnd){
+    var cacheKey = closerName + "|" + rangeStart + "|" + rangeEnd;
+    if (eventCache[cacheKey]) return eventCache[cacheKey];
+
+    var conn = connections[closerName];
+    var url = "https://www.googleapis.com/calendar/v3/calendars/primary/events"
+      + "?timeMin=" + encodeURIComponent(toRFC3339(rangeStart, false))
+      + "&timeMax=" + encodeURIComponent(toRFC3339(rangeEnd, true))
+      + "&singleEvents=true&orderBy=startTime&maxResults=2500";
+
+    var res = await fetch(url, { headers: { Authorization: "Bearer " + conn.token } });
+    if (res.status === 401){
+      delete connections[closerName];
+      throw new Error("token-expirado");
+    }
+    if (!res.ok) throw new Error("Erro ao consultar o Google Calendar (HTTP " + res.status + ")");
+    var data = await res.json();
+    var items = data.items || [];
+    var mapped = items.filter(isEventACall).map(function(ev){
+      var start = new Date(ev.start.dateTime);
+      return { closer: closerName, data: ymd(start), type: "Call Comercial", titulo: ev.summary || "" };
+    });
+    eventCache[cacheKey] = mapped;
+    return mapped;
+  }
+
+  function simulatedEventsFor(closerName, rangeStart, rangeEnd){
+    var events = [];
+    var cursor = new Date(rangeStart + "T00:00:00");
+    var end = new Date(rangeEnd + "T00:00:00");
+    while (cursor <= end){
+      var n = simulatedCallsForDay(closerName, cursor);
+      for (var i = 0; i < n; i++) events.push({ closer: closerName, data: ymd(cursor), type: "Call Comercial" });
+      cursor = addDays(cursor, 1);
+    }
+    return events;
+  }
+
+  var CalendarSource = {
+    closers: CLOSERS_META,
+    isConnected: isConnected,
+    connect: connectCloser,
+    // Ponto único de consulta: para closers conectadas, busca eventos reais
+    // no Google Calendar (já filtrados pela regra de "call comercial"); para
+    // as demais, usa dados simulados até que conectem também.
+    getEvents: async function(rangeStart, rangeEnd){
+      var all = [];
+      var errors = [];
+      for (var i = 0; i < CLOSERS_META.length; i++){
+        var name = CLOSERS_META[i].name;
+        if (isConnected(name)){
+          try {
+            var real = await fetchRealEvents(name, rangeStart, rangeEnd);
+            all = all.concat(real);
+          } catch (e) {
+            errors.push(name);
+            all = all.concat(simulatedEventsFor(name, rangeStart, rangeEnd));
+          }
+        } else {
+          all = all.concat(simulatedEventsFor(name, rangeStart, rangeEnd));
+        }
+      }
+      if (errors.length){
+        showGoogleBanner("error", "Não foi possível atualizar a agenda de " + errors.join(", ") + " agora (token pode ter expirado — clique em \"Reconectar\"). Mostrando dados simulados para essa(s) closer(s) enquanto isso.");
+      }
+      return all;
+    }
+  };
+
+  /* =========================================================================
+     ÍCONES (svg simples, reutilizados nos cards)
+  ========================================================================= */
+  var ICONS = {
+    users: '<circle cx="8" cy="8" r="3"></circle><path d="M2.5 19c0-3.5 2.5-5.5 5.5-5.5s5.5 2 5.5 5.5"></path><circle cx="16.5" cy="9" r="2.4"></circle><path d="M14.8 13.2c2.6.3 4.7 2.1 4.7 5.3"></path>',
+    target: '<circle cx="12" cy="12" r="7.2"></circle><circle cx="12" cy="12" r="3.6"></circle><circle cx="12" cy="12" r="0.6" fill="currentColor"></circle>',
+    userCheck: '<circle cx="9.5" cy="8" r="3.4"></circle><path d="M3 20c0-3.7 2.9-5.8 6.5-5.8"></path><path d="M14.5 14.8l2 2 3.7-4.2"></path>',
+    checkCircle: '<circle cx="12" cy="12" r="8"></circle><path d="M8.3 12.3l2.4 2.4 5-5.4"></path>',
+    phone: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"></rect><line x1="10" y1="18" x2="14" y2="18"></line>',
+    phoneWave: '<rect x="5" y="2.5" width="9" height="19" rx="2.5"></rect><line x1="7.7" y1="18" x2="11.3" y2="18"></line><path d="M18 8a4.4 4.4 0 0 1 0 6.2"></path><path d="M20.6 6a8 8 0 0 1 0 10.6"></path>',
+    phoneX: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"></rect><line x1="10" y1="18" x2="14" y2="18"></line><line x1="17" y1="4" x2="21.5" y2="8.5"></line><line x1="21.5" y1="4" x2="17" y2="8.5"></line>',
+    calendarCheck: '<rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 9.5h17"></path><path d="M8 3v3.5M16 3v3.5"></path><path d="M8.5 14l2 2 4-4.5"></path>',
+    calendar: '<rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 9.5h17"></path><path d="M8 3v3.5M16 3v3.5"></path>',
+    reply: '<path d="M9 8 4 12l5 4"></path><path d="M4 12h9a6 6 0 0 1 6 6v1"></path>',
+    refresh: '<path d="M4 12a8 8 0 0 1 13.9-5.4M20 12a8 8 0 0 1-13.9 5.4"></path><path d="M18 4v3h-3M6 20v-3h3"></path>',
+    message: '<path d="M4 5.5h16v10.5H9.5L5 20v-4H4z"></path>',
+    briefcase: '<rect x="3" y="8" width="18" height="11" rx="2"></rect><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 13h18"></path>',
+    trendUp: '<path d="M3 17l6-6 4 4 8-9"></path><path d="M15 6h6v6"></path>',
+    clock: '<circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3.5 2"></path>',
+    filter: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5L4 5Z"></path>'
+  };
+  function icon(name){ return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || "") + "</svg>"; }
+
+  /* =========================================================================
+     UTILITÁRIOS DE AGREGAÇÃO
+  ========================================================================= */
+  function pct(num, den){ return den > 0 ? Math.round((num / den) * 100) : 0; }
+  function sum(arr, fn){ return arr.reduce(function(a, x){ return a + fn(x); }, 0); }
+
+  function resolveRange(state){
+    if (state.exactDate){ return { start: state.exactDate, end: state.exactDate }; }
+    switch (state.period){
+      case "hoje": return { start: ymd(TODAY), end: ymd(TODAY) };
+      case "ontem": { var y = addDays(TODAY, -1); return { start: ymd(y), end: ymd(y) }; }
+      case "semana": { var ws = weekStart(TODAY); return { start: ymd(ws), end: ymd(addDays(ws, 6)) }; }
+      case "semana_passada": { var wsp = addDays(weekStart(TODAY), -7); return { start: ymd(wsp), end: ymd(addDays(wsp, 6)) }; }
+      case "mes": { var ms = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1); return { start: ymd(ms), end: ymd(TODAY) }; }
+      case "custom": return { start: state.customStart, end: state.customEnd };
+      default: return { start: ymd(TODAY), end: ymd(TODAY) };
+    }
+  }
+  function inRange(dateStr, range){ return dateStr >= range.start && dateStr <= range.end; }
+  function matchesDims(row, filters){
+    if (filters.responsavel !== "all" && row.responsavel !== filters.responsavel) return false;
+    if (filters.sdr !== "all" && row.sdr !== filters.sdr) return false;
+    if (filters.closer !== "all" && row.closer !== filters.closer) return false;
+    if (filters.origem !== "all" && row.origem !== filters.origem) return false;
+    return true;
+  }
+  function filterLeads(leads, filters, range){ return leads.filter(function(l){ return inRange(l.data, range) && matchesDims(l, filters); }); }
+  function filterCalls(calls, filters, range){ return calls.filter(function(c){ return inRange(c.data, range) && matchesDims(c, filters); }); }
+
+  function computeSDR(leads){
+    var total = leads.length;
+    var mql = leads.filter(function(l){ return l.mql; }).length;
+    var contatados = leads.filter(function(l){ return l.contatado; }).length;
+    var sla = leads.filter(function(l){ return l.contatado && l.contatoSLA; }).length;
+    return {
+      leads: total, mql: mql, contatados: contatados, sla: sla,
+      ligFeitas: sum(leads, function(l){ return l.ligacoesFeitas; }),
+      ligAtend: sum(leads, function(l){ return l.ligacoesAtendidas; }),
+      agendamentos: leads.filter(function(l){ return l.agendamentoSDR; }).length,
+      naoAtendResp: leads.filter(function(l){ return l.naoAtendidaRespondeu; }).length,
+      naoAtendNaoResp: leads.filter(function(l){ return l.naoAtendidaNaoResponde; }).length
+    };
+  }
+  function computeFollowUp(leads){
+    var fu = leads.filter(function(l){ return l.followUp; });
+    return {
+      realizados: fu.length,
+      ligFeitas: sum(fu, function(l){ return l.followUp.ligacoesFeitas; }),
+      ligAtend: sum(fu, function(l){ return l.followUp.ligacoesAtendidas; }),
+      msgEnviadas: sum(fu, function(l){ return l.followUp.mensagensEnviadas; }),
+      msgRespondidas: sum(fu, function(l){ return l.followUp.mensagensRespondidas; }),
+      agendamentos: fu.filter(function(l){ return l.followUp.agendamentoRealizado; }).length
+    };
+  }
+  function computeCloserMetrics(calls){
+    var realizadas = calls.filter(function(c){ return c.realizada; }).length;
+    var agendadas = calls.length;
+    var propostas = calls.filter(function(c){ return c.proposta; }).length;
+    var vendas = calls.filter(function(c){ return c.venda; }).length;
+    return { agendadas: agendadas, realizadas: realizadas, comparecimento: pct(realizadas, agendadas), noshow: Math.max(0, agendadas - realizadas), propostas: propostas, vendas: vendas, conversao: pct(vendas, realizadas) };
+  }
+
+  /* =========================================================================
+     ESTADO E RENDERIZAÇÃO
+  ========================================================================= */
+  var state = {
+    period: "hoje",
+    customStart: ymd(addDays(TODAY, -6)),
+    customEnd: ymd(TODAY),
+    exactDate: null,
+    responsavel: "all", sdr: "all", closer: "all", origem: "all",
+    chartCloser: "all",
+    sort: { key: "vendas", dir: "desc" }
+  };
+
+  var PERIODS = [
+    { key: "hoje", label: "Hoje" }, { key: "ontem", label: "Ontem" },
+    { key: "semana", label: "Esta semana" }, { key: "semana_passada", label: "Semana passada" },
+    { key: "mes", label: "Este mês" }, { key: "custom", label: "Personalizado" }
+  ];
+
+  function el(tag, attrs, html){
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function(k){ e.setAttribute(k, attrs[k]); });
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+  function fillSelect(select, options, current){
+    select.innerHTML = "";
+    options.forEach(function(o){ var opt = el("option", { value: o.value }, o.label); if (o.value === current) opt.selected = true; select.appendChild(opt); });
+  }
+  function fmtDate(d){ return String(d.getDate()).padStart(2,"0") + "/" + String(d.getMonth()+1).padStart(2,"0") + "/" + d.getFullYear(); }
+
+  function buildPeriodPills(){
+    var row = document.getElementById("periodRow");
+    row.innerHTML = "";
+    PERIODS.forEach(function(p){
+      var btn = el("button", { type: "button", class: "pill" + (state.period === p.key && !state.exactDate ? " active" : "") }, p.label);
+      btn.addEventListener("click", function(){ state.period = p.key; state.exactDate = null; document.getElementById("filterDate").value = ""; render(); });
+      row.appendChild(btn);
+    });
+  }
+
+  function setupFilters(){
+    fillSelect(document.getElementById("filterResponsavel"), [{ value: "all", label: "Todos" }].concat(RESPONSAVEIS.map(function(r){ return { value: r, label: r }; })), "all");
+    fillSelect(document.getElementById("filterSDR"), [{ value: "all", label: "Todos" }].concat(SDRS.map(function(s){ return { value: s, label: s }; })), "all");
+    fillSelect(document.getElementById("filterCloser"), [{ value: "all", label: "Todas" }].concat(CLOSERS_META.map(function(c){ return { value: c.name, label: c.name }; })), "all");
+    fillSelect(document.getElementById("filterOrigem"), [{ value: "all", label: "Todas" }].concat(ORIGENS.map(function(o){ return { value: o, label: o }; })), "all");
+    fillSelect(document.getElementById("chartCloserSelect"), [{ value: "all", label: "Todas as closers" }].concat(CLOSERS_META.map(function(c){ return { value: c.name, label: c.name }; })), "all");
+
+    document.getElementById("filterResponsavel").addEventListener("change", function(e){ state.responsavel = e.target.value; render(); });
+    document.getElementById("filterSDR").addEventListener("change", function(e){ state.sdr = e.target.value; render(); });
+    document.getElementById("filterCloser").addEventListener("change", function(e){ state.closer = e.target.value; render(); });
+    document.getElementById("filterOrigem").addEventListener("change", function(e){ state.origem = e.target.value; render(); });
+    document.getElementById("chartCloserSelect").addEventListener("change", function(e){ state.chartCloser = e.target.value; render(); });
+
+    document.getElementById("customStart").value = state.customStart;
+    document.getElementById("customEnd").value = state.customEnd;
+    document.getElementById("customStart").addEventListener("change", function(e){ state.customStart = e.target.value; render(); });
+    document.getElementById("customEnd").addEventListener("change", function(e){ state.customEnd = e.target.value; render(); });
+    document.getElementById("filterDate").addEventListener("change", function(e){ state.exactDate = e.target.value || null; render(); });
+    document.getElementById("detailClose").addEventListener("click", function(){ state.chartCloser = "all"; render(); });
+
+    document.getElementById("todayLabel").textContent = fmtDate(TODAY);
+  }
+
+  function kpiCard(label, value, sub, iconName){
+    var div = el("div", { class: "kpi" });
+    var top = el("div", { class: "kpi-top" });
+    top.appendChild(el("div", { class: "kpi-label" }, label));
+    top.appendChild(el("div", {}, icon(iconName)));
+    div.appendChild(top);
+    div.appendChild(el("div", { class: "kpi-value num" }, String(value)));
+    if (sub) div.appendChild(el("div", { class: "kpi-sub num" }, sub));
+    return div;
+  }
+
+  function renderSDR(leads){
+    var m = computeSDR(leads);
+    var holder = document.getElementById("sdrCards");
+    holder.innerHTML = "";
+    holder.appendChild(kpiCard("Leads", m.leads, null, "users"));
+    holder.appendChild(kpiCard("MQL", m.mql, pct(m.mql, m.leads) + "% dos leads", "target"));
+    holder.appendChild(kpiCard("Contatados", m.contatados, pct(m.contatados, m.leads) + "% dos leads", "userCheck"));
+    holder.appendChild(kpiCard("Contato dentro da SLA", m.sla, pct(m.sla, m.contatados) + "% dos contatados", "checkCircle"));
+    holder.appendChild(kpiCard("Ligações feitas", m.ligFeitas, null, "phone"));
+    holder.appendChild(kpiCard("Ligações atendidas", m.ligAtend, pct(m.ligAtend, m.ligFeitas) + "% das ligações", "phoneWave"));
+    holder.appendChild(kpiCard("Agendamentos", m.agendamentos, pct(m.agendamentos, m.leads) + "% dos leads", "calendarCheck"));
+    holder.appendChild(kpiCard("Não atendidas + responderam", m.naoAtendResp, pct(m.naoAtendResp, m.leads) + "% dos leads", "reply"));
+    holder.appendChild(kpiCard("Não atendidas + não responderam", m.naoAtendNaoResp, pct(m.naoAtendNaoResp, m.leads) + "% dos leads", "phoneX"));
+  }
+
+  function renderFollowUp(leads){
+    var m = computeFollowUp(leads);
+    var holder = document.getElementById("followCards");
+    holder.innerHTML = "";
+    holder.appendChild(kpiCard("Follow-ups realizados", m.realizados, null, "refresh"));
+    holder.appendChild(kpiCard("Ligações de follow feitas", m.ligFeitas, null, "phone"));
+    holder.appendChild(kpiCard("Ligações de follow atendidas", m.ligAtend, pct(m.ligAtend, m.ligFeitas) + "% das ligações", "phoneWave"));
+    holder.appendChild(kpiCard("Mensagens de follow enviadas", m.msgEnviadas, null, "message"));
+    holder.appendChild(kpiCard("Mensagens de follow respondidas", m.msgRespondidas, pct(m.msgRespondidas, m.msgEnviadas) + "% das mensagens", "reply"));
+    holder.appendChild(kpiCard("Agendamentos realizados", m.agendamentos, pct(m.agendamentos, m.realizados) + "% dos follow-ups", "calendarCheck"));
+  }
+
+  function renderCloser(calls){
+    var m = computeCloserMetrics(calls);
+    var holder = document.getElementById("closerCards");
+    holder.innerHTML = "";
+    holder.appendChild(kpiCard("Calls agendadas", m.agendadas, null, "clock"));
+    holder.appendChild(kpiCard("Calls realizadas", m.realizadas, null, "calendar"));
+    holder.appendChild(kpiCard("Taxa de comparecimento", m.comparecimento + "%", m.realizadas + " de " + m.agendadas + " calls", "userCheck"));
+    holder.appendChild(kpiCard("No-show", m.noshow, null, "phoneX"));
+    holder.appendChild(kpiCard("Propostas na mesa", m.propostas, null, "briefcase"));
+    holder.appendChild(kpiCard("Vendas realizadas", m.vendas, null, "trendUp"));
+    holder.appendChild(kpiCard("Taxa de conversão", m.conversao + "%", m.vendas + " de " + m.realizadas + " realizadas", "target"));
+  }
+
+  var WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+
+  function agendaWeekRange(){
+    if (state.period === "semana_passada" && !state.exactDate) return addDays(weekStart(TODAY), -7);
+    return weekStart(TODAY);
+  }
+
+  var renderToken = 0; // evita que uma resposta antiga (async) sobrescreva uma mais nova
+
+  async function renderAgenda(){
+    var myToken = ++renderToken;
+    var ws = agendaWeekRange();
+    var weekEnd = addDays(ws, 6);
+    var events = await CalendarSource.getEvents(ymd(ws), ymd(weekEnd));
+    if (myToken !== renderToken) return null; // uma renderização mais nova já começou
+
+    var closersToShow = state.closer === "all" ? CLOSERS_META : CLOSERS_META.filter(function(c){ return c.name === state.closer; });
+
+    var listHolder = document.getElementById("closerListHolder");
+    listHolder.innerHTML = "";
+    var totalHoje = 0, totalSemana = 0;
+    var perCloserPerDay = {};
+
+    CLOSERS_META.forEach(function(c){
+      var connected = isConnected(c.name);
+      var closerEvents = events.filter(function(e){ return e.closer === c.name; });
+      var perDay = [0,0,0,0,0,0,0];
+      closerEvents.forEach(function(e){ perDay[isoDow(new Date(e.data + "T00:00:00"))]++; });
+      perCloserPerDay[c.name] = perDay;
+      var hojeCount = closerEvents.filter(function(e){ return e.data === ymd(TODAY); }).length;
+      var semanaCount = closerEvents.length;
+      if (state.closer === "all" || state.closer === c.name){ totalHoje += hojeCount; totalSemana += semanaCount; }
+
+      var row = el("div", { class: "closer-row" + (state.chartCloser === c.name ? " selected" : "") });
+      var who = el("div", { class: "who" });
+      var nameEl = el("div", { class: "name" }, c.name);
+      nameEl.style.cursor = "pointer";
+      who.appendChild(nameEl);
+      var conn = el("div", { class: "conn" });
+      conn.appendChild(el("span", { class: "status-dot " + (connected ? "on" : "off") }));
+      conn.appendChild(document.createTextNode(connected ? "Agenda conectada (Google Calendar)" : "Agenda não conectada — mostrando dados simulados"));
+      who.appendChild(conn);
+      row.appendChild(who);
+
+      var stats = el("div", { class: "stats" });
+      stats.innerHTML = '<div><div class="lbl">Hoje</div><div class="val num">' + hojeCount + '</div></div><div><div class="lbl">Semana</div><div class="val num">' + semanaCount + "</div></div>";
+      row.appendChild(stats);
+
+      var btn = el("button", { type: "button", class: "connect-btn" + (connected ? " is-connected" : "") }, icon("calendarCheck") + (connected ? "Reconectar" : "Conectar"));
+      btn.addEventListener("click", function(){
+        btn.disabled = true;
+        btn.innerHTML = icon("calendarCheck") + "Abrindo login do Google…";
+        connectCloser(c.name).then(function(){
+          render();
+        }).catch(function(err){
+          btn.disabled = false;
+          btn.innerHTML = icon("calendarCheck") + (connected ? "Reconectar" : "Conectar");
+          if (err && err.message === "google-not-loaded"){
+            showGoogleBanner("error", "O login do Google ainda não carregou. Aguarde alguns segundos e tente de novo.");
+          } else if (err && (err.type === "popup_closed" || err.error === "popup_closed_by_user" || err.error === "access_denied")){
+            // usuário cancelou o login — não é um erro para mostrar
+          } else {
+            showGoogleBanner("error", "Não foi possível conectar a agenda de " + c.name + ". Tente novamente.");
+          }
+        });
+      });
+      row.appendChild(btn);
+
+      nameEl.addEventListener("click", function(){ state.chartCloser = (state.chartCloser === c.name) ? "all" : c.name; render(); });
+      listHolder.appendChild(row);
+    });
+
+    document.getElementById("agendaTotalHoje").textContent = totalHoje;
+    document.getElementById("agendaTotalSemana").textContent = totalSemana;
+
+    var detailCard = document.getElementById("detailCard");
+    if (state.chartCloser !== "all"){
+      var connectedDetail = isConnected(state.chartCloser);
+      var perDay = perCloserPerDay[state.chartCloser];
+      var weekTotal = perDay.reduce(function(a,b){ return a+b; }, 0);
+      var hojeVal = perDay[isoDow(TODAY)];
+      var peak = Math.max.apply(null, perDay);
+
+      detailCard.style.display = "block";
+      document.getElementById("detailTitle").textContent = "Visão individual · " + state.chartCloser;
+
+      var statsHolder = document.getElementById("detailStats");
+      statsHolder.innerHTML = "";
+      [["Calls hoje", hojeVal], ["Calls na semana", weekTotal], ["Pico da semana", peak], ["Agenda", connectedDetail ? "Conectada (Google Calendar)" : "Não conectada"]].forEach(function(pair){
+        var box = el("div");
+        box.appendChild(el("div", { class: "lbl" }, pair[0]));
+        box.appendChild(el("div", { class: "val" + (typeof pair[1] === "number" ? " num" : "") }, String(pair[1])));
+        statsHolder.appendChild(box);
+      });
+
+      var daysHolder = document.getElementById("detailDays");
+      daysHolder.innerHTML = "";
+      WEEKDAY_LABELS.forEach(function(lbl, i){
+        var d = el("div", { class: "detail-day" });
+        d.appendChild(el("div", { class: "lbl" }, lbl));
+        d.appendChild(el("div", { class: "val num" }, String(perDay[i])));
+        daysHolder.appendChild(d);
+      });
+
+      document.getElementById("ruleIntro").textContent = connectedDetail
+        ? "Integração ativa — os eventos do Google Calendar desta closer são classificados automaticamente pela regra abaixo."
+        : "Esta closer ainda não conectou a agenda. Quando conectar, apenas os eventos que atenderem à regra abaixo serão contados como calls.";
+      document.getElementById("ruleDef").innerHTML =
+        "<div><b>Palavras-chave no título:</b> " + CALL_RULE.keywords.join(", ") + "</div>" +
+        "<div><b>Duração mínima:</b> " + CALL_RULE.minDurationMinutes + " minutos</div>" +
+        "<div><b>Exige convidado:</b> " + (CALL_RULE.requireAttendee ? "Sim" : "Não") + "</div>" +
+        "<div><b>Ignorar eventos de dia inteiro:</b> " + (CALL_RULE.ignoreAllDay ? "Sim" : "Não") + "</div>";
+    } else {
+      detailCard.style.display = "none";
+    }
+
+    var table = document.getElementById("agendaTable");
+    var thead = "<thead><tr><th>Closer</th>" + WEEKDAY_LABELS.map(function(d){ return '<th class="num-col">' + d + "</th>"; }).join("") + '<th class="num-col total">Total</th></tr></thead>';
+    var rows = closersToShow.map(function(c){
+      var perDay = perCloserPerDay[c.name];
+      var rowTotal = perDay.reduce(function(a,b){ return a+b; }, 0);
+      return "<tr><td class='rowlabel'>" + c.name + "</td>" + perDay.map(function(v){ return '<td class="num-col num">' + v + "</td>"; }).join("") + '<td class="num-col num total">' + rowTotal + "</td></tr>";
+    });
+    var totalsRow = "<tr><td class='rowlabel total'>Total equipe</td>" +
+      WEEKDAY_LABELS.map(function(_, di){
+        var v = closersToShow.reduce(function(acc, c){ return acc + perCloserPerDay[c.name][di]; }, 0);
+        return '<td class="num-col num total">' + v + "</td>";
+      }).join("") +
+      '<td class="num-col num total">' + closersToShow.reduce(function(acc, c){ return acc + perCloserPerDay[c.name].reduce(function(a,b){return a+b;},0); }, 0) + "</td></tr>";
+    table.innerHTML = thead + "<tbody>" + rows.join("") + totalsRow + "</tbody>";
+
+    return { weekStart: ws, weekEnd: weekEnd, events: events };
+  }
+
+  function renderWeeklyChart(agendaCtx){
+    if (!agendaCtx) return;
+    var closerSel = document.getElementById("chartCloserSelect");
+    if (closerSel.value !== state.chartCloser) closerSel.value = state.chartCloser;
+
+    var events = agendaCtx.events;
+    if (state.chartCloser !== "all") events = events.filter(function(e){ return e.closer === state.chartCloser; });
+
+    var perDay = [0,0,0,0,0,0,0];
+    events.forEach(function(e){ perDay[isoDow(new Date(e.data + "T00:00:00"))]++; });
+
+    var svg = document.getElementById("weeklyChart");
+    var W = 700, H = 250, padL = 34, padR = 12, padT = 16, padB = 34;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var rawMax = Math.max(1, Math.max.apply(null, perDay));
+    var step = rawMax <= 10 ? 2 : Math.ceil(rawMax / 5 / 5) * 5;
+    var niceMax = Math.ceil(rawMax / step) * step;
+    if (niceMax === 0) niceMax = step;
+    var ticks = [];
+    for (var t = 0; t <= niceMax; t += step) ticks.push(t);
+
+    var barGap = 18;
+    var barW = (plotW - barGap * (perDay.length - 1)) / perDay.length;
+
+    var parts = [];
+    ticks.forEach(function(tv){
+      var y = padT + plotH - (tv / niceMax) * plotH;
+      parts.push('<line class="grid-line" x1="' + padL + '" y1="' + y + '" x2="' + (padL + plotW) + '" y2="' + y + '"></line>');
+      parts.push('<text class="axis-label" x="' + (padL - 8) + '" y="' + (y + 4) + '" text-anchor="end">' + tv + "</text>");
+    });
+    parts.push('<line class="axis-line" x1="' + padL + '" y1="' + (padT + plotH) + '" x2="' + (padL + plotW) + '" y2="' + (padT + plotH) + '"></line>');
+
+    perDay.forEach(function(v, i){
+      var barH = (v / niceMax) * plotH;
+      var x = padL + i * (barW + barGap);
+      var y = padT + plotH - barH;
+      parts.push('<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + Math.max(barH,1) + '" rx="4" fill="var(--accent)"><title>' + WEEKDAY_LABELS[i] + ": " + v + " calls</title></rect>");
+      if (v > 0) parts.push('<text class="bar-value" x="' + (x + barW/2) + '" y="' + (y - 6) + '" text-anchor="middle">' + v + "</text>");
+      parts.push('<text class="bar-label" x="' + (x + barW/2) + '" y="' + (padT + plotH + 20) + '" text-anchor="middle">' + WEEKDAY_LABELS[i] + "</text>");
+    });
+
+    svg.innerHTML = parts.join("");
+  }
+
+  function renderRanking(){
+    var calls = DataSource.getCalls();
+    var range = resolveRange(state);
+    var filtered = filterCalls(calls, state, range);
+
+    var closersToShow = state.closer === "all" ? CLOSERS_META.map(function(c){ return c.name; }) : [state.closer];
+    var rows = closersToShow.map(function(name){
+      var m = computeCloserMetrics(filtered.filter(function(c){ return c.closer === name; }));
+      return { closer: name, agendadas: m.agendadas, realizadas: m.realizadas, comparecimento: m.comparecimento, noshow: m.noshow, propostas: m.propostas, vendas: m.vendas, conversao: m.conversao };
+    });
+
+    rows.sort(function(a, b){
+      var dir = state.sort.dir === "asc" ? 1 : -1;
+      if (state.sort.key === "closer") return a.closer.localeCompare(b.closer) * dir;
+      return (a[state.sort.key] - b[state.sort.key]) * dir;
+    });
+
+    var COLS = [
+      { key: "closer", label: "Closer" }, { key: "agendadas", label: "Calls Agendadas" },
+      { key: "realizadas", label: "Calls Realizadas" }, { key: "comparecimento", label: "Comparecimento %" },
+      { key: "noshow", label: "No-show" }, { key: "propostas", label: "Propostas" },
+      { key: "vendas", label: "Vendas" }, { key: "conversao", label: "Conversão %" }
+    ];
+
+    var table = document.getElementById("rankingTable");
+    var theadCells = COLS.map(function(c){
+      var active = state.sort.key === c.key;
+      var arrow = active ? '<span class="arrow">' + (state.sort.dir === "asc" ? "▲" : "▼") + "</span>" : "";
+      var cls = "sortable" + (active ? " active" : "") + (c.key === "closer" ? "" : " num-col");
+      return '<th class="' + cls + '" data-key="' + c.key + '">' + c.label + arrow + "</th>";
+    }).join("");
+
+    var bodyRows = rows.map(function(r){
+      return "<tr><td class='rowlabel'>" + r.closer + "</td>" +
+        '<td class="num-col num">' + r.agendadas + "</td>" + '<td class="num-col num">' + r.realizadas + "</td>" +
+        '<td class="num-col num">' + r.comparecimento + "%</td>" + '<td class="num-col num">' + r.noshow + "</td>" +
+        '<td class="num-col num">' + r.propostas + "</td>" + '<td class="num-col num">' + r.vendas + "</td>" +
+        '<td class="num-col num">' + r.conversao + "%</td></tr>";
+    }).join("");
+
+    table.innerHTML = "<thead><tr>" + theadCells + "</tr></thead><tbody>" + bodyRows + "</tbody>";
+
+    table.querySelectorAll("th.sortable").forEach(function(th){
+      th.addEventListener("click", function(){
+        var key = th.getAttribute("data-key");
+        if (state.sort.key === key){ state.sort.dir = state.sort.dir === "asc" ? "desc" : "asc"; }
+        else { state.sort.key = key; state.sort.dir = "desc"; }
+        renderRanking();
+      });
+    });
+  }
+
+  async function render(){
+    buildPeriodPills();
+    document.getElementById("customRange").classList.toggle("show", state.period === "custom" && !state.exactDate);
+
+    var range = resolveRange(state);
+    var leads = filterLeads(DataSource.getLeads(), state, range);
+    var calls = filterCalls(DataSource.getCalls(), state, range);
+
+    renderSDR(leads);
+    renderFollowUp(leads);
+    renderCloser(calls);
+    var agendaCtx = await renderAgenda();
+    renderWeeklyChart(agendaCtx);
+    renderRanking();
+  }
+
+  setupFilters();
+  render();
+})();
+</script>
+</body>
+</html>
